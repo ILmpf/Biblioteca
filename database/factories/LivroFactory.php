@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Database\Factories;
+
+use App\Models\Editora;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Livro>
+ */
+class LivroFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'editora_id' => Editora::factory(),
+            'isbn' => fake()->isbn13(),
+            'nome' => fake()->sentence(3),
+            'bibliografia' => fake()->text(200),
+            'imagem' => 'images/book-icon.png',
+            'preco' => fake()->randomFloat(),
+        ];
+    }
+}
