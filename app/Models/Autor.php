@@ -15,6 +15,7 @@ class Autor extends Model
 
     protected $table = 'autores';
 
+    //RELAÇÕES
     public function livro(): BelongsToMany
     {
         return $this->belongsToMany(Livro::class);

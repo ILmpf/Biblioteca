@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Autor;
 use App\Models\Editora;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,5 +28,16 @@ class LivroFactory extends Factory
             'imagem' => 'images/book-icon.png',
             'preco' => fake()->randomFloat(),
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function ($livro) {
+            $autores = Autor::inRandomOrder()
+                ->take(rand(1, 3))
+                ->pluck('id');
+
+            $livro->autor()->attach($autores);
+        });
     }
 }

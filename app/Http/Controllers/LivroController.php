@@ -7,9 +7,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreLivroRequest;
 use App\Http\Requests\UpdateLivroRequest;
 use App\Models\Livro;
-use App\RequisicaoEstado;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class LivroController extends Controller
 {
@@ -51,12 +50,22 @@ class LivroController extends Controller
             };
        });
 
+        $availableCount = Livro::whereDoesntHave('requisicao', function ($q) {
+            $q->where('requisicao_livro.entregue', false);
+        })->count();
+
+        $unavailableCount = Livro::whereHas('requisicao', function ($q) {
+            $q->where('requisicao_livro.entregue', false);
+        })->count();
+
         $livros = $query
             ->with(['autor', 'editora'])
             ->get();
 
         return view('livro.index', [
-            'livros' => $livros
+            'livros' => $livros,
+            'availableCount' => $availableCount,
+            'unavailableCount' => $unavailableCount,
         ]);
     }
 

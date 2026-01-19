@@ -24,6 +24,7 @@ class Requisicao extends Model
         'estado' => RequisicaoEstado::ACTIVE,
     ];
 
+    //RELAÇÕES
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -31,6 +32,7 @@ class Requisicao extends Model
 
     public function livro(): BelongsToMany
     {
-        return $this->belongsToMany(Livro::class, 'requisicao_livro');
+        return $this->belongsToMany(Livro::class, 'requisicao_livro')
+            ->withPivot('entregue');
     }
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Autor;
+use App\Models\Livro;
+use App\Models\Requisicao;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -20,8 +23,13 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Leonardo',
+            'email' => 'leonardo@example.com',
+            'password' => 'password123!',
         ]);
+
+        Autor::factory(10)->create();
+        Livro::factory(10)->create();
+        Requisicao::factory(10)->create();
     }
 }

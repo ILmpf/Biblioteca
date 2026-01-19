@@ -21,6 +21,7 @@ class Livro extends Model
 
     ];
 
+    //RELAÇÕES
     public function editora(): belongsTo
     {
         return $this->belongsTo(Editora::class);
@@ -37,10 +38,18 @@ class Livro extends Model
             ->withPivot('entregue');
     }
 
+    //HELPERS
     public function isAvailable(): bool
     {
         return ! $this->requisicao()
             ->wherePivot('entregue', false)
             ->exists();
+    }
+
+    public function scopeAvailable($query)
+    {
+        return $query->whereDoesntHave('requisicao', function ($q) {
+            $q->wherePivot('entregue', false);
+        });
     }
 }
