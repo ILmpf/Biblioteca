@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\RequisicaoEstado;
@@ -7,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Requisicao extends Model
 {
@@ -24,7 +25,7 @@ class Requisicao extends Model
         'estado' => RequisicaoEstado::ACTIVE,
     ];
 
-    //RELAÇÕES
+    // RELAÇÕES
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

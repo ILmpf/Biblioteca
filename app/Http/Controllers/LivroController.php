@@ -8,7 +8,7 @@ use App\Http\Requests\StoreLivroRequest;
 use App\Http\Requests\UpdateLivroRequest;
 use App\Models\Livro;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 
 class LivroController extends Controller
 {
@@ -17,80 +17,51 @@ class LivroController extends Controller
      */
     public function index(Request $request)
     {
-       $query = Livro::query();
-
-
-       if ($request->filled('nome')) {
-           $query->where('nome', 'like', '%' . $request->nome . '%');
-       }
-
-       if ($request->filled('autor')) {
-            $query->whereHas('autor', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->autor . '%');
-            });
-       }
-
-       if ($request->filled('editora')) {
-            $query->whereHas('editora', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->editora . '%');
-            });
-       }
-
-       $query->when($request->filled('estado'), function ($q) use ($request) {
-            match ($request->estado) {
-                'indisponivel' => $q->whereHas('requisicao', fn ($qr) =>
-                $qr->where('requisicao_livro.entregue', 0)
-                ),
-
-                'disponivel' => $q->whereDoesntHave('requisicao', fn ($qr) =>
-                $qr->where('requisicao_livro.entregue', 0)
-                ),
-
-                default => null,
-            };
-       });
-
-        $availableCount = Livro::whereDoesntHave('requisicao', function ($q) {
-            $q->where('requisicao_livro.entregue', false);
-        })->count();
-
-        $unavailableCount = Livro::whereHas('requisicao', function ($q) {
-            $q->where('requisicao_livro.entregue', false);
-        })->count();
-
-        $livros = $query
+        $livros = Livro::query()
+            ->when($request->nome, fn ($q, $v) => $q->nome($v))
+            ->when($request->autor, fn ($q, $v) => $q->autor($v))
+            ->when($request->editora, fn ($q, $v) => $q->editora($v))
+            ->when($request->estado, function ($q, $estado) {
+                match ($estado) {
+                    'disponivel' => $q->disponivel(),
+                    'indisponivel' => $q->indisponivel(),
+                };
+            })
             ->with(['autor', 'editora'])
             ->get();
 
         return view('livro.index', [
             'livros' => $livros,
-            'availableCount' => $availableCount,
-            'unavailableCount' => $unavailableCount,
+            'availableCount' => Livro::disponivel()->count(),
+            'unavailableCount' => Livro::indisponivel()->count(),
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): void
     {
-        //
+        Gate::authorize('create', Livro::class);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreLivroRequest $request): void
+    public function store(StoreLivroRequest $request): never
     {
-        //
+
+        dd('persiste o livro');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Livro $livro): void
+    public function show(Livro $livro)
     {
-        //
+        return view('livro.show', [
+            'livro' => $livro,
+        ]);
     }
 
     /**
@@ -106,14 +77,18 @@ class LivroController extends Controller
      */
     public function update(UpdateLivroRequest $request, Livro $livro): void
     {
-        //
+        Gate::authorize('update', $livro);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Livro $livro): void
+    public function destroy(Livro $livro)
     {
-        //
+        Gate::authorize('delete', $livro);
+
+        $livro->delete();
+
+        return to_route('livro.index');
     }
 }

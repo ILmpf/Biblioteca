@@ -34,7 +34,7 @@ class LivroFactory extends Factory
     {
         return $this->afterCreating(function ($livro) {
             $autores = Autor::inRandomOrder()
-                ->take(rand(1, 3))
+                ->take(random_int(1, 3))
                 ->pluck('id');
 
             $livro->autor()->attach($autores);

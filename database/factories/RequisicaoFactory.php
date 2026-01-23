@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Livro;
-use App\Models\Requisicao;
 use App\Models\User;
 use App\RequisicaoEstado;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,7 +26,7 @@ class RequisicaoFactory extends Factory
         $estado = fake()->randomElement(RequisicaoEstado::cases());
 
         return [
-            'numero' => 'REQ-' . fake()->unique()->numberBetween(1, 100),
+            'numero' => 'REQ-'.fake()->unique()->numberBetween(1, 100),
             'user_id' => User::factory(),
             'estado' => $estado->value,
             'data_requisicao' => $dataRequisicao->format('Y-m-d'),
@@ -39,7 +40,7 @@ class RequisicaoFactory extends Factory
         return $this->afterCreating(function ($requisicao) {
             $livros = Livro::available()
                 ->inRandomOrder()
-                ->take(rand(1, 3))
+                ->take(random_int(1, 3))
                 ->get();
 
             foreach ($livros as $livro) {

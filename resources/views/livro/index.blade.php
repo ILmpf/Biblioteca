@@ -3,6 +3,21 @@
         <header class="py-8 md:py-12">
             <h1 class="text-3xl font-bold">Livros</h1>
             <p class="text-muted-foreground text-sm mt-2">Requisita um livro!</p>
+
+            @can('isAdmin')
+                <button
+                    class="card bg-base-100 w-45 border shadow-sm mt-8 cursor-pointer"
+                    x-data
+                    @click="$dispatch('open-modal', 'create-livro')"
+                    type="button"
+                >
+                    <div class="card-body items-center">
+                        <x-icons.create></x-icons.create>
+                        <h2 class="card-title">Criar novo livro</h2>
+                        <div class="card-actions justify-end"></div>
+                    </div>
+                </button>
+            @endcan
         </header>
 
         <div>
@@ -51,5 +66,20 @@
             @endforelse
             </div>
         </div>
+
+        <x-modal name="create-livro" title="Novo Livro">
+            <form method="POST" action="{{route('livro.store')}}" class="w-full">
+                @csrf
+
+                <div class="space-y-6">
+                    <x-form.field
+                        label="Título do Livro"
+                        name="nome"
+                        placeholder="Introduz o título do livro"
+                        autofocus
+                        />
+                </div>
+            </form>
+        </x-modal>
     </div>
 </x-layout>

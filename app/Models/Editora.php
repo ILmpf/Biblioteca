@@ -13,7 +13,7 @@ class Editora extends Model
     /** @use HasFactory<\Database\Factories\EditoraFactory> */
     use HasFactory;
 
-    //RELAÇÕES
+    // RELAÇÕES
     public function livro(): HasMany
     {
         return $this->hasMany(Livro::class);

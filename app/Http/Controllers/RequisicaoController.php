@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Requisicao;
@@ -10,7 +12,7 @@ class RequisicaoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): void
     {
         //
     }
@@ -18,7 +20,7 @@ class RequisicaoController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): void
     {
         //
     }
@@ -26,7 +28,7 @@ class RequisicaoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): void
     {
         //
     }
@@ -34,7 +36,7 @@ class RequisicaoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Requisicao $requisicao)
+    public function show(Requisicao $requisicao): void
     {
         //
     }
@@ -42,7 +44,7 @@ class RequisicaoController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Requisicao $requisicao)
+    public function edit(Requisicao $requisicao): void
     {
         //
     }
@@ -50,7 +52,7 @@ class RequisicaoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Requisicao $requisicao)
+    public function update(Request $request, Requisicao $requisicao): void
     {
         //
     }
@@ -58,7 +60,7 @@ class RequisicaoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Requisicao $requisicao)
+    public function destroy(Requisicao $requisicao): void
     {
         //
     }
