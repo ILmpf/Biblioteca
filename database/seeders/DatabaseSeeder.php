@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Autor::factory(10)->create();
-        Livro::factory(10)->create();
+        Livro::factory(30)->create();
         Requisicao::factory(10)->create();
     }
 }

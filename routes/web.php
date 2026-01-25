@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EditoraController;
 use App\Http\Controllers\LivroController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\RequisicaoController;
@@ -36,6 +37,12 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::post('/livros', [LivroController::class, 'store'])->name('livro.store');
     Route::delete('/livros/{livro}', [LivroController::class, 'destroy'])->name('livro.destroy');
+});
+
+//EDITORAS
+Route::middleware('auth')->group(function () {
+    Route::get('/editoras', [EditoraController::class, 'index'])->name('editora.index');
+    Route::get('/editoras/{editora}', [EditoraController::class, 'show'])->name('editora.show');
 });
 
 // REQUISIÇÕES

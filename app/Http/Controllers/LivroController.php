@@ -28,7 +28,8 @@ class LivroController extends Controller
                 };
             })
             ->with(['autor', 'editora'])
-            ->get();
+            ->paginate(6)
+            ->withQueryString();
 
         return view('livro.index', [
             'livros' => $livros,

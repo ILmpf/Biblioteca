@@ -1,4 +1,4 @@
-<svg width="20px" height="20px" viewBox="0 0 24 24" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<svg viewBox="0 0 24 24" {{ $attributes->merge(['class' => 'inline-block w-6 h-6']) }} xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
     <g transform="translate(0 -1028.4)">
         <rect height="20" width="14" y="1031.4" x="5" fill="#bdc3c7"/>
         <g transform="translate(0 2)">

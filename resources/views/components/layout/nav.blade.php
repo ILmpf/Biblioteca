@@ -1,29 +1,40 @@
 <nav class="border-b border-border px-6">
-    <div class="max-w-7xl mx-auto h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto h-30 flex items-center justify-between">
         <div>
             <a href="/">
-                <img src="/images/logo.png" alt="Biblioteca logo" width="300">
+                <img src="/images/logo.png" alt="Biblioteca logo" class="w-auto h-auto">
             </a>
         </div>
 
         <div class="flex gap-x-5 items-center">
             @auth
-                <a href="{{route('livro.index')}}" class="flex items-center gap-0.5">
-                    <x-icons.book />
-                    <span>Livros</span>
-                </a>
-                <a href="" class="flex items-center gap-0.5">
-                    <x-icons.building />
-                    <span>Editoras</span>
-                </a>
-                <a href="" class="flex items-center gap-0.5">
-                    <x-icons.author />
-                    <span>Autores</span>
-                </a>
-                <a href="" class="flex items-center gap-0.5">
-                    <x-icons.clipboard />
-                    <span>Requisições</span>
-                </a>
+                <x-navbar.link href="{{route('livro.index')}}" :active="request()->routeIs('livro.*')">
+                    <x-slot:icon>
+                        <x-icons.book class="w-10 h-10"/>
+                    </x-slot:icon>
+                    Livros
+                </x-navbar.link>
+
+                <x-navbar.link href="{{route('editora.index')}}" :active="request()->routeIs('editora.*')">
+                    <x-slot:icon>
+                        <x-icons.building class="w-10 h-10"/>
+                    </x-slot:icon>
+                    Editoras
+                </x-navbar.link>
+
+                <x-navbar.link href="" >
+                    <x-slot:icon>
+                        <x-icons.author class="w-10 h-10"/>
+                    </x-slot:icon>
+                    Autores
+                </x-navbar.link>
+
+                <x-navbar.link href="">
+                    <x-slot:icon>
+                        <x-icons.clipboard class="w-10 h-10"/>
+                    </x-slot:icon>
+                    Requisições
+                </x-navbar.link>
 
                 @can('isAdmin')
                     <div class="relative group">
@@ -39,8 +50,8 @@
 
                         <div
                             class="absolute right-0 mt-2 w-48 bg-base-100 border border-border rounded-md shadow-lg
-                   opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                   transition-all duration-200 z-50"
+                            opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                            transition-all duration-200 z-50"
                         >
                             <a href="{{route('admin.users.create')}}"
                                class="block px-4 py-2 hover:bg-white">

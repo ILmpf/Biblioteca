@@ -1,4 +1,4 @@
-<svg width="20px" height="20px" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--noto" preserveAspectRatio="xMidYMid meet">
+<svg {{ $attributes->merge(['class' => 'inline-block w-6 h-6']) }} viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--noto" preserveAspectRatio="xMidYMid meet">
 
     <path d="M18.64 114.25l83.27-98.22c2.63 0 7.45.24 7.45 6.74v94.53c0 2.63-2.13 4.76-4.76 4.76H24.42c-2.63.01-5.78-2.35-5.78-7.81z" fill="#a15d38">
 
