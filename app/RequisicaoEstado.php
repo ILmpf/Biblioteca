@@ -14,7 +14,7 @@ enum RequisicaoEstado: string
     {
         return match ($this) {
             self::ACTIVE => 'Ativa',
-            self::COMPLETED => 'Terminada',
+            self::COMPLETED => 'Concluída',
             self::CANCELLED => 'Cancelada',
         };
     }

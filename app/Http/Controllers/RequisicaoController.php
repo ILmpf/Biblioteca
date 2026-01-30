@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Livro;
 use App\Models\Requisicao;
+use App\RequisicaoEstado;
 use Illuminate\Http\Request;
 
 class RequisicaoController extends Controller
@@ -12,17 +14,53 @@ class RequisicaoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): void
+    public function index(Request $request)
     {
-        //
+        $user = auth()->user();
+
+        $baseQuery = Requisicao::query()
+            ->when($user->role !== 'admin', fn ($q) => $q->where('user_id', $user->id));
+
+        $ativas = (clone $baseQuery)->where('estado', RequisicaoEstado::ACTIVE)->count();
+        $ultimos30Dias = (clone $baseQuery)->where('created_at', '>=', now()->subDays(30))->count();
+        $entreguesHoje = (clone $baseQuery)->whereDate('data_entrega', today())->count();
+
+        $filteredQuery = (clone $baseQuery);
+
+        if ($request->filtro) {
+            match ($request->filtro) {
+                'ativas' => $filteredQuery->where('estado', RequisicaoEstado::ACTIVE),
+                'ultimos30Dias' => $filteredQuery->where('created_at', '>=', now()->subDays(30)),
+                'entreguesHoje' => $filteredQuery->whereDate('data_entrega', today()),
+            };
+        }
+
+        $requisicoes = $filteredQuery
+            ->with(['livro', 'user'])
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('requisicao.index', ['requisicoes' => $requisicoes, 'ativas' => $ativas, 'ultimos30Dias' => $ultimos30Dias, 'entreguesHoje' => $entreguesHoje]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): void
+    public function create(Request $request)
     {
-        //
+        $livroSelecionado = null;
+
+        if ($request->filled('livro_id')) {
+            $livroSelecionado = Livro::available()->findOrFail($request->livro_id);
+        }
+
+        $livrosDisponiveis = Livro::available()->get();
+
+        return view('requisicao.create', [
+            'livroSelecionado' => $livroSelecionado,
+            'livrosDisponiveis' => $livrosDisponiveis
+        ]);
     }
 
     /**
@@ -36,9 +74,11 @@ class RequisicaoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Requisicao $requisicao): void
+    public function show(Requisicao $requisicao)
     {
-        //
+        return view('requisicao.show', [
+            'requisicao' => $requisicao,
+        ]);
     }
 
     /**

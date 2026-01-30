@@ -31,7 +31,8 @@ class RequisicaoFactory extends Factory
             'estado' => $estado->value,
             'data_requisicao' => $dataRequisicao->format('Y-m-d'),
             'data_entrega_prevista' => $dataEntregaPrevista->format('Y-m-d'),
-            'data_entrega' => $estado === RequisicaoEstado::COMPLETED ? fake()->dateTimeBetween($dataRequisicao, 'now')->format('Y-m-d') : null,
+            'data_entrega' => $estado === RequisicaoEstado::COMPLETED
+                ? fake()->dateTimeBetween($dataRequisicao, 'now')->format('Y-m-d') : null,
         ];
     }
 
@@ -44,15 +45,11 @@ class RequisicaoFactory extends Factory
                 ->get();
 
             foreach ($livros as $livro) {
-                $livro->requisicao()
-                    ->wherePivot('entregue', false)
-                    ->updateExistingPivot(
-                        $livro->requisicao->pluck('id'),
-                        ['entregue' => true]
-                    );
-
                 $requisicao->livro()->attach($livro->id, [
-                    'entregue' => $requisicao->estado === RequisicaoEstado::COMPLETED,
+                    'entregue' => in_array($requisicao->estado, [
+                        RequisicaoEstado::COMPLETED,
+                        RequisicaoEstado::CANCELLED,
+                    ]),
                 ]);
             }
         });

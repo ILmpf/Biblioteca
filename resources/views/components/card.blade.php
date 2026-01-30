@@ -2,7 +2,8 @@
     'class' => 'card card-side bg-transparent shadow-sm
                hover:shadow-xl hover:-translate-y-0.5
                transition-all duration-200'
-    ]) }}>
+]) }}>
+    {{-- CLICKABLE CARD CONTENT --}}
     <a href="{{ $attributes->get('href') }}" class="flex flex-1">
         <figure class="w-48 h-48 shrink-0 overflow-hidden rounded-1">
             {{ $image }}
@@ -18,10 +19,13 @@
             @endisset
 
             {{ $slot }}
-
-            <div class="mt-auto pt-4 flex justify-end">
-                {{ $actions }}
-            </div>
         </div>
     </a>
+
+    {{-- ACTIONS (NOT inside the anchor) --}}
+    @isset($actions)
+        <div class="absolute bottom-4 right-4">
+            {{ $actions }}
+        </div>
+    @endisset
 </div>

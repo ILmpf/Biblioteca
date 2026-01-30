@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->default('cidadão');
+            $table->string('image_path')->default('images/user_image_placeholder.webp');
             $table->rememberToken();
             $table->timestamps();
         });

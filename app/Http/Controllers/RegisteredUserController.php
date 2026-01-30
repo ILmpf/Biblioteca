@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class RegisteredUserController extends Controller
@@ -30,7 +31,7 @@ class RegisteredUserController extends Controller
         return view('auth.register', [
             'title' => 'Criar Administrador',
             'description' => 'Cria um novo utilizador administrador.',
-            'action' => route('admin.users.store'),
+            'action' => route('register'),
             'buttonText' => 'Criar Admin',
             'role' => 'admin',
         ]);
@@ -38,12 +39,6 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
-            'password' => ['required', 'string', 'min:8', 'max:255'],
-        ]);
-
         $role = 'cidadão';
 
         if ($request->role === 'admin') {
@@ -51,10 +46,23 @@ class RegisteredUserController extends Controller
             $role = 'admin';
         }
 
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
+        ];
+
+        if ($role === 'cidadão') {
+            $rules['password'] = ['required', 'string', 'min:8', 'max:255'];
+        }
+
+        $validated = $request->validate($rules);
+
+        $password = $role === 'admin' ? Str::random(8) : $validated['password'];
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($password),
             'role' => $role,
         ]);
 

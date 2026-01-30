@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Editora;
-use Illuminate\Http\Request;
 
 class EditoraController extends Controller
 {
@@ -14,14 +15,14 @@ class EditoraController extends Controller
     {
         $editoras = Editora::orderBy('nome')->paginate(9);
 
-        return view('editora.index',[
+        return view('editora.index', [
             'editoras' => $editoras,
         ]);
     }
 
     public function show(Editora $editora)
     {
-        return view('editora.show',[
+        return view('editora.show', [
             'editora' => $editora,
         ]);
     }

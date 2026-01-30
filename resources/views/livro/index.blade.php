@@ -18,7 +18,7 @@
                         @click="$dispatch('open-modal', 'create-livro')"
                         type="button"
                     >
-                        <x-icons.create />
+                        <x-icons.create/>
                         Criar novo livro
                     </button>
                 @endcan
@@ -47,7 +47,7 @@
         </div>
 
         <div class="mt-6">
-            <hr class="border-base-200" />
+            <hr class="border-base-200"/>
             <form method="GET"
                   action="{{ route('livro.index') }}"
                   class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -100,7 +100,7 @@
 
         <div class="mt-6 text-muted">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            @forelse($livros as $livro)
+                @forelse($livros as $livro)
                     <x-card href="{{ route('livro.show', $livro) }}">
                         <x-slot:image>
                             <img
@@ -136,6 +136,9 @@
 
                         <x-slot:actions>
                             <button
+                                type="button"
+                                x-data
+                                @click="window.location='{{ route('requisicao.create', ['livro_id' => $livro->id]) }}'"
                                 class="btn btn-sm
                                 {{ $livro->isAvailable()
                                     ? 'bg-green-400 hover:bg-green-500'
@@ -149,8 +152,8 @@
                     </x-card>
 
                 @empty
-                <p>Não existem livros de momento.</p>
-            @endforelse
+                    <p>Não existem livros de momento.</p>
+                @endforelse
             </div>
         </div>
 
@@ -164,7 +167,56 @@
                         name="nome"
                         placeholder="Introduz o título do livro"
                         autofocus
-                        />
+                        required
+                    />
+
+                    <div x-data="{ editora: '' }" class="space-y-2">
+                        <label class="font-medium">Editora</label>
+
+                        <select
+                            name="editora_id"
+                            x-model="editora"
+                            class="select select-md w-full"
+                            required
+                        >
+                            <option value="new">Seleciona uma editora</option>
+                            <option value="new">Nova Editora</option>
+
+                            @foreach($editoras as $editora)
+                                <option value="{{ $editora->id }}">
+                                    {{ $editora->nome }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        {{-- Appears only if "new" --}}
+                        <div x-show="editora === 'new'" x-transition>
+                            <x-form.field
+                                label="Nova Editora"
+                                name="editora_nome"
+                                placeholder="Nome da editora"
+                            />
+                        </div>
+                    </div>
+
+                    <x-form.field
+                        label="Editora"
+                        name="editora"
+                        placeholder="Introduz a Editora do livro"
+                    />
+
+                    <x-form.field
+                        label="Bibliografia"
+                        name="bibliogragia"
+                        type="textarea"
+                        placeholder="Bibliografia..."
+                    />
+
+                    <div class="flex justify-end gap-x-5">
+                        <button type="button" class="btn bg-red-400 hover:bg-red-500" @click="$dispatch('close-modal')">Cancelar</button>
+                        <button type="submit" class="btn bg-green-400 hover:bg-green-500">Criar</button>
+                    </div>
+
                 </div>
             </form>
         </x-modal>

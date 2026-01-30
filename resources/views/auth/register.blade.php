@@ -8,13 +8,15 @@
 
             <x-form.field name="name" label="Nome" />
             <x-form.field name="email" type="email" label="Email"/>
-            <x-form.field name="password" type="password" label="Password"/>
+            @if(!isset($role) || $role !== 'admin')
+                <x-form.field name="password" type="password" label="Password"/>
+            @endif
 
             @isset($role)
                 <input type="hidden" name="role" value="{{ $role }}">
             @endisset
 
-            <button class="btn mt-2 h-10" type="submit">
+            <button class="btn mt-2 h-10 w-full" type="submit">
                 {{ $buttonText }}
             </button>
         </form>

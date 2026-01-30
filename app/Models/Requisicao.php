@@ -19,6 +19,9 @@ class Requisicao extends Model
 
     protected $casts = [
         'estado' => RequisicaoEstado::class,
+        'data_requisicao' => 'date',
+        'data_entrega' => 'date',
+        'data_entrega_prevista' => 'date',
     ];
 
     protected $attributes = [

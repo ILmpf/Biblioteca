@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLivroRequest;
 use App\Http\Requests\UpdateLivroRequest;
+use App\Models\Autor;
+use App\Models\Editora;
 use App\Models\Livro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -33,6 +35,8 @@ class LivroController extends Controller
 
         return view('livro.index', [
             'livros' => $livros,
+            'editoras' => Editora::orderBy('nome')->get(),
+            'autores' => Autor::orderBy('nome')->get(),
             'availableCount' => Livro::disponivel()->count(),
             'unavailableCount' => Livro::indisponivel()->count(),
         ]);

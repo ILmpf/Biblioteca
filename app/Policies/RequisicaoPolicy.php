@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\Livro;
 use App\Models\Requisicao;
 use App\Models\User;
 
@@ -14,7 +15,7 @@ class RequisicaoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,15 +23,23 @@ class RequisicaoPolicy
      */
     public function view(User $user, Requisicao $requisicao): bool
     {
-        return false;
+        return $user->role === 'admin' || $requisicao->user_id === $user->id;
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, Livro $livro): bool
     {
-        return $user->role === 'cidadão';
+        if (! $livro->isAvailable()) {
+            return false;
+        }
+
+        if ($user->role !== 'admin' && $user->ActiveRequisicoesCount() >= 3) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

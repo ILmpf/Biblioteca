@@ -23,14 +23,22 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Leonardo',
-            'email' => 'leonardo@example.com',
+            'name' => 'Leonardo Administrador',
+            'email' => 'leonardo@admin.com',
             'role' => 'admin',
+            'password' => 'password123!',
+        ]);
+
+        $cidadao = User::factory()->create([
+            'name' => 'Leonardo Utilizador',
+            'email' => 'leonardo@user.com',
+            'role' => 'cidadão',
             'password' => 'password123!',
         ]);
 
         Autor::factory(10)->create();
         Livro::factory(30)->create();
         Requisicao::factory(10)->create();
+        Requisicao::factory(5)->for($cidadao, 'user')->create();
     }
 }

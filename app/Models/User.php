@@ -53,4 +53,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Requisicao::class);
     }
+
+    // HELPERS
+    public function ActiveRequisicoesCount(): int
+    {
+        return $this->requisicao()
+            ->whereNull('data_entrega')
+            ->count();
+    }
 }

@@ -21,7 +21,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::get('/admin/users/create', [RegisteredUserController::class, 'createAdmin'])->name('admin.users.create');
-    Route::post('/admin/users', [RegisteredUserController::class, 'store'])->name('admin.users.store');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
 });
 
 Route::middleware('auth')->group(function () {
@@ -39,11 +39,14 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::delete('/livros/{livro}', [LivroController::class, 'destroy'])->name('livro.destroy');
 });
 
-//EDITORAS
+// EDITORAS
 Route::middleware('auth')->group(function () {
     Route::get('/editoras', [EditoraController::class, 'index'])->name('editora.index');
     Route::get('/editoras/{editora}', [EditoraController::class, 'show'])->name('editora.show');
 });
 
 // REQUISIÇÕES
-Route::get('requisicoes', [RequisicaoController::class, 'index'])->name('requisicao.index');
+Route::get('/requisicoes', [RequisicaoController::class, 'index'])->name('requisicao.index');
+Route::get('/requisicoes/create', [RequisicaoController::class, 'create'])->name('requisicao.create');
+Route::post('/requisicoes', [RequisicaoController::class, 'store'])->name('requisicao.store');
+Route::get('/requisicoes/{requisicao}', [RequisicaoController::class, 'show'])->name('requisicao.show');
