@@ -1,15 +1,17 @@
+---
 name: Bug Report
 description: File a bug report.
 title: "[Bug]: "
-labels: ["bug"]
+labels:
+  - bug
 assignees:
-- ILmpf
+  - ILmpf
+projects: -ILmpf/2
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for reporting a bug! Please fill out the form below.
-
   - type: textarea
     id: what-happened
     attributes:
@@ -18,7 +20,6 @@ body:
       placeholder: Describe the problem clearly.
     validations:
       required: true
-
   - type: textarea
     id: expected
     attributes:
@@ -26,4 +27,3 @@ body:
       placeholder: What should have happened?
     validations:
       required: false
-
