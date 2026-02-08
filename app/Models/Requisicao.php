@@ -34,7 +34,7 @@ class Requisicao extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function livro(): BelongsToMany
+    public function livros(): BelongsToMany
     {
         return $this->belongsToMany(Livro::class, 'requisicao_livro')
             ->withPivot('entregue');

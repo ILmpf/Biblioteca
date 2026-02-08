@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/livros', [LivroController::class, 'index'])->name('livro.index');
     Route::get('/livros/{livro}', [LivroController::class, 'show'])->name('livro.show');
+    Route::post('/livros/import-google', [LivroController::class, 'importGoogle'])->name('livro.import-google');
 });
 
 Route::middleware(['auth', 'can:isAdmin'])->group(function () {
@@ -50,3 +51,5 @@ Route::get('/requisicoes', [RequisicaoController::class, 'index'])->name('requis
 Route::get('/requisicoes/create', [RequisicaoController::class, 'create'])->name('requisicao.create');
 Route::post('/requisicoes', [RequisicaoController::class, 'store'])->name('requisicao.store');
 Route::get('/requisicoes/{requisicao}', [RequisicaoController::class, 'show'])->name('requisicao.show');
+Route::patch('/requisicoes/{requisicao}/cancel', [RequisicaoController::class, 'cancel'])
+    ->name('requisicao.cancel');

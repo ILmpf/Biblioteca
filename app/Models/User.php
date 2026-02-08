@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\RequisicaoEstado;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -49,16 +50,17 @@ class User extends Authenticatable
         ];
     }
 
-    public function requisicao(): HasMany
+    public function requisicoes(): HasMany
     {
         return $this->hasMany(Requisicao::class);
     }
 
     // HELPERS
-    public function ActiveRequisicoesCount(): int
+    public function activeRentedBooksCount(): int
     {
-        return $this->requisicao()
-            ->whereNull('data_entrega')
-            ->count();
+        return $this->requisicoes()
+            ->where('estado', RequisicaoEstado::ACTIVE->value)
+            ->get()
+            ->sum(fn ($requisicao) => $requisicao->livros->where('pivot.entregue', 0)->count());
     }
 }

@@ -6,15 +6,35 @@
                 Voltar às requisições
             </a>
 
-            @can('isAdmin')
-                <button
-                    x-data
-                    @click="$dispatch('toggle-edit')"
-                    class="btn btn-outline flex items-center gap-x-2">
-                    <x-icons.edit/>
-                    Editar Requisição
-                </button>
-            @endcan
+            <div class="flex gap-2">
+                @can('update', $requisicao)
+                    <button
+                        x-data
+                        @click="$dispatch('toggle-edit')"
+                        class="btn btn-outline flex items-center gap-x-2">
+                        <x-icons.edit/>
+                        Editar Requisição
+                    </button>
+                @endcan
+
+                @if($requisicao->estado == \App\RequisicaoEstado::ACTIVE)
+                        @can('cancel', $requisicao)
+                            <form
+                                action="{{route('requisicao.cancel', $requisicao)}}"
+                                method="POST"
+                                onsubmit="return confirm('Tem a certeza que deseja cancelar esta requisição?');"
+                            >
+                                @csrf
+                                @method('PATCH')
+
+                                <button type="submit" class="btn btn-error flex items-center gap-x-2">
+                                    <x-fas-window-close />
+                                    Cancelar
+                                </button>
+                            </form>
+                        @endcan
+                @endif
+            </div>
         </div>
 
         <div
@@ -132,7 +152,7 @@
             <hr class="border-gray-200">
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                @foreach ($requisicao->livro as $livro)
+                @foreach ($requisicao->livros as $livro)
                     <x-card href="{{ route('livro.show', $livro) }}">
                         <x-slot:image>
                             <img

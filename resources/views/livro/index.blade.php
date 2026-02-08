@@ -1,6 +1,6 @@
 <x-layout>
     <div>
-        <header class="py-10 md:py-14 border-b border-base-200">
+        <header class="py-10 md:py-14">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                     <h1 class="text-4xl font-bold tracking-tight">
@@ -26,7 +26,7 @@
         </header>
 
 
-        <div class="mt-6 bg-base-100 p-6 rounded-xl shadow-sm space-y-6">
+        <div class="mt-2 bg-base-100 p-6 rounded-xl shadow-sm space-y-6">
             <div class="flex flex-wrap gap-2">
                 <a href="/livros" class="btn {{ request()->has('estado') ? 'btn-outline' : '' }}">
                     Todos
@@ -47,7 +47,6 @@
         </div>
 
         <div class="mt-6">
-            <hr class="border-base-200"/>
             <form method="GET"
                   action="{{ route('livro.index') }}"
                   class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -83,6 +82,25 @@
                 </div>
             </form>
         </div>
+
+        <form method="POST" action="{{ route('livro.import-google') }}" class="flex gap-2 mt-4">
+            @csrf
+            <input
+                type="text"
+                name="q"
+                placeholder="Pesquisar livros na Google Books"
+                class="input input-bordered flex-1"
+            >
+            <button type="submit" class="btn btn-primary">
+                Importar
+            </button>
+        </form>
+
+        @if(session('success'))
+            <div class="alert alert-success my-4">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-8">
             {{ $livros->links('components.form.pagination') }}

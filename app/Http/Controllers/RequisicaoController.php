@@ -6,8 +6,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Livro;
 use App\Models\Requisicao;
+use App\Notifications\RequisicaoCreated;
 use App\RequisicaoEstado;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class RequisicaoController extends Controller
 {
@@ -36,7 +40,7 @@ class RequisicaoController extends Controller
         }
 
         $requisicoes = $filteredQuery
-            ->with(['livro', 'user'])
+            ->with(['livros', 'user'])
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -59,16 +63,69 @@ class RequisicaoController extends Controller
 
         return view('requisicao.create', [
             'livroSelecionado' => $livroSelecionado,
-            'livrosDisponiveis' => $livrosDisponiveis
+            'livrosDisponiveis' => $livrosDisponiveis,
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): void
+    public function store(Request $request)
     {
-        //
+        $request->validate([
+            'livros' => ['required', 'array', 'min:1', 'max:3'],
+            'livros.*' => ['required', 'exists:livros,id'],
+        ]);
+
+        $livrosId = collect($request->livros)
+            ->filter()
+            ->unique();
+
+        if (! Gate::allows('create', [Requisicao::class, $livrosId->count()])) {
+            return back()
+                ->withErrors([
+                    'livros' => 'Não pode requisitar mais de 3 livros em simultâneo.',
+                ])
+                ->withInput();
+        }
+
+        $livros = Livro::whereIn('id', $livrosId)->get();
+
+        foreach ($livros as $livro) {
+            if (! $livro->isAvailable()) {
+                return back()
+                    ->withErrors([
+                        'livros' => "O livro \"{$livro->nome}\" não está disponível.",
+                    ])
+                    ->withInput();
+            }
+        }
+
+        DB::transaction(function () use ($livrosId) {
+            $requisicao = Requisicao::create([
+                'numero' => 'TEMP',
+                'user_id' => auth()->id(),
+                'estado' => RequisicaoEstado::ACTIVE,
+                'data_requisicao' => now(),
+                'data_entrega_prevista' => now()->addDays(5),
+            ]);
+
+            $requisicao->update([
+                'numero' => 'REQ-'.$requisicao->id,
+            ]);
+
+            $requisicao->livros()->attach(
+                $livrosId->mapWithKeys(fn ($id) => [
+                    $id => ['entregue' => false],
+                ])
+            );
+
+            Auth::user()->notify((new RequisicaoCreated($requisicao))->afterCommit());
+        });
+
+        return redirect()
+            ->route('requisicao.index')
+            ->with('success', 'Requisicao criada com sucesso! Reberás um mail com os detalhes.');
     }
 
     /**
@@ -79,6 +136,30 @@ class RequisicaoController extends Controller
         return view('requisicao.show', [
             'requisicao' => $requisicao,
         ]);
+    }
+
+    public function cancel(Requisicao $requisicao)
+    {
+        Gate::authorize('cancel', $requisicao);
+
+        if ($requisicao->estado === RequisicaoEstado::CANCELLED) {
+            return back()->withErrors('A requisição já se encontra cancelada.');
+        }
+
+        DB::transaction(function () use ($requisicao) {
+            $requisicao->update([
+                'estado' => RequisicaoEstado::CANCELLED,
+                'data_entrega' => null,
+            ]);
+
+            $requisicao->livros()->syncWithPivotValues(
+                $requisicao->livros->modelKeys(),
+                ['entregue' => true],
+                false
+            );
+        });
+
+        return back()->with('success', 'Requisição cancelada com sucesso.');
     }
 
     /**

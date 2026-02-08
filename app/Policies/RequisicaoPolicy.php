@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\Livro;
 use App\Models\Requisicao;
 use App\Models\User;
+use App\RequisicaoEstado;
 
 class RequisicaoPolicy
 {
@@ -29,17 +29,24 @@ class RequisicaoPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user, Livro $livro): bool
+    public function create(User $user, int $requestedBooks): bool
     {
-        if (! $livro->isAvailable()) {
+        // Admins bypass limits
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return ($user->activeRentedBooksCount() + $requestedBooks) <= 3;
+    }
+
+    public function cancel(User $user, Requisicao $requisicao): bool
+    {
+        if ($requisicao->estado === RequisicaoEstado::CANCELLED) {
             return false;
         }
 
-        if ($user->role !== 'admin' && $user->ActiveRequisicoesCount() >= 3) {
-            return false;
-        }
-
-        return true;
+        return $user->role === 'admin'
+            || $requisicao->user_id === $user->id;
     }
 
     /**
@@ -47,7 +54,7 @@ class RequisicaoPolicy
      */
     public function update(User $user, Requisicao $requisicao): bool
     {
-        return false;
+        return $user->role === 'admin';
     }
 
     /**

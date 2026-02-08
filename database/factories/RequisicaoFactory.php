@@ -45,7 +45,7 @@ class RequisicaoFactory extends Factory
                 ->get();
 
             foreach ($livros as $livro) {
-                $requisicao->livro()->attach($livro->id, [
+                $requisicao->livros()->attach($livro->id, [
                     'entregue' => in_array($requisicao->estado, [
                         RequisicaoEstado::COMPLETED,
                         RequisicaoEstado::CANCELLED,

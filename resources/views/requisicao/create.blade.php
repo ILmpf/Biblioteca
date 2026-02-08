@@ -32,6 +32,16 @@
             <div class="space-y-4">
                 <h2 class="font-bold text-xl">Livros a requisitar</h2>
 
+                @if ($errors->any())
+                    <div class="alert alert-error">
+                        <ul class="list-disc pl-4">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <template x-for="(livroId, index) in livros" :key="index">
                     <div class="flex flex-col gap-2 p-2 border rounded-lg bg-base-100">
 

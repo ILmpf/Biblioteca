@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateLivroRequest;
 use App\Models\Autor;
 use App\Models\Editora;
 use App\Models\Livro;
+use App\Services\Google;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -40,6 +41,15 @@ class LivroController extends Controller
             'availableCount' => Livro::disponivel()->count(),
             'unavailableCount' => Livro::indisponivel()->count(),
         ]);
+    }
+
+    public function importGoogle(Request $request)
+    {
+        $query = $request->input('q', 'Laravel');
+        $service = new Google();
+        $service->searcAndSave($query);
+
+        return redirect()->back()->with('success', 'Livros importados com sucesso!');
     }
 
     /**
