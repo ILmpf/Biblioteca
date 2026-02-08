@@ -1,0 +1,32 @@
+name: Feature Request
+description: Suggest a new feature or improvement.
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees:
+  - ILmpf
+projects:
+  - ILmpf/2
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please fill out the form below.
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature description
+      description: Describe the feature you would like to see added.
+      placeholder: Clearly explain the feature or improvement.
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: Why would this feature be useful?
+      placeholder: Explain the benefits or improvements this feature brings.
+    validations:
+      required: false
+
