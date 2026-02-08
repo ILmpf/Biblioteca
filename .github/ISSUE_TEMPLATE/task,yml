@@ -1,0 +1,26 @@
+---
+name: Task
+description: Track a specific task or implementation step.
+title: "[Task]: "
+labels: ["task"]
+assignees:
+  - ILmpf
+projects: -ILmpf/2
+body:
+  - type: textarea
+    id: task-title
+    attributes:
+      label: Task
+      description: Describe the task or implementation step.
+      placeholder: Example - "Create DB Models"
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / Details
+      description: Any additional info.
+      placeholder: 
+    validations:
+      required: false
