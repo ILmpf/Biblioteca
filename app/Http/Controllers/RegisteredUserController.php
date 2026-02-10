@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -67,9 +68,9 @@ class RegisteredUserController extends Controller
         ]);
 
         if ($role === 'cidadão') {
-            Auth::login($user);
+            event(new Registered($user));
 
-            return redirect('/')->with('success', 'Registo efetuado com sucesso!');
+            return back()->with('success', 'Registo efetuado com sucesso! Um email de confirmação foi enviado. Por favor verifica a tua caixa de correio.');
         }
 
         return back()->with('success', 'Admin registado com sucesso!');

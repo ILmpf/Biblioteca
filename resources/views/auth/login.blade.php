@@ -6,6 +6,10 @@
             <x-form.field name="email" type="email" label="Email"/>
             <x-form.field name="password" type="password" label="Password"/>
 
+            <label>
+                <input type="checkbox" name="remember" class="checkbox"> Lembrar-me
+            </label>
+
             <button class="btn mt-2 h-10 w-full" type="submit" data-test="login-button">Login</button>
         </form>
     </x-form>
