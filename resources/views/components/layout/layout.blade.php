@@ -9,9 +9,11 @@
 <body>
     <x-layout.nav />
 
-    <main class="max-w-7xl mx-auto px-6">
+    <main class="max-w-7xl mx-auto px-6 min-h-[calc(100vh-4rem-20rem)]">
         {{ $slot }}
     </main>
+
+    <x-layout.footer />
 
     @session('success')
         <div

@@ -1,11 +1,13 @@
 <nav class="border-b border-border px-6">
     <div class="max-w-7xl mx-auto h-30 flex items-center justify-between">
+        <!-- Logo -->
         <div>
-            <a href="/">
+            <a href="{{ route('home') }}" class="hover:opacity-80 transition-opacity">
                 <img src="/images/logo.png" alt="Biblioteca logo" class="w-auto h-auto">
             </a>
         </div>
 
+        <!-- Menus de Navegação -->
         <div class="flex gap-x-5 items-center">
             @auth
                 <x-navbar.dropdown
@@ -110,7 +112,7 @@
                         </div>
                     </x-slot:trigger>
 
-                    <x-navbar.dropdown-item href="">
+                    <x-navbar.dropdown-item href="{{ route('profile.show') }}">
                         <x-slot:icon>
                             <x-fas-user class="w-5 h-5" />
                         </x-slot:icon>
@@ -138,5 +140,4 @@
             @endguest
         </div>
     </div>
-
 </nav>

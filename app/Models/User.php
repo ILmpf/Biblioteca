@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Notifications\CustomVerifyEmail;
 use App\RequisicaoEstado;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -74,5 +75,13 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('estado', RequisicaoEstado::ACTIVE->value)
             ->get()
             ->sum(fn ($requisicao) => $requisicao->livros->where('pivot.entregue', 0)->count());
+    }
+
+    /**
+     * Send the email verification notification.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new CustomVerifyEmail());
     }
 }
