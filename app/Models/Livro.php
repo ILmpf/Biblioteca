@@ -9,17 +9,46 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property int $id
+ * @property string $nome
+ * @property string $isbn
+ * @property string $bibliografia
+ * @property int $editora_id
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|Autor[] $autor
+ * @property-read Editora $editora
+ * @property-read \Illuminate\Database\Eloquent\Collection|Requisicao[] $requisicao
+ */
 class Livro extends Model
 {
-    /** @use HasFactory<\Database\Factories\LivroFactory> */
     use HasFactory;
 
-    protected $casts = [
-
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'nome',
+        'isbn',
+        'bibliografia',
+        'editora_id',
+        'imagem',
+        'preco',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
+
     // RELAÇÕES
-    public function editora(): belongsTo
+    public function editora(): BelongsTo
     {
         return $this->belongsTo(Editora::class);
     }
@@ -44,42 +73,36 @@ class Livro extends Model
     }
 
     #[\Illuminate\Database\Eloquent\Attributes\Scope]
-    protected function nome($query, $nome)
+    protected function nome($query, string $nome)
     {
         return $query->where('nome', 'like', "%{$nome}%");
     }
 
-    public function scopeAutor($query, $autor)
+    public function scopeAutor($query, string $autor)
     {
-        return $query->whereHas('autor', fn ($q) => $q->where('nome', 'like', "%{$autor}%")
-        );
+        return $query->whereHas('autor', fn ($q) => $q->where('nome', 'like', "%{$autor}%"));
     }
 
-    public function scopeEditora($query, $editora)
+    public function scopeEditora($query, string $editora)
     {
-        return $query->whereHas('editora', fn ($q) => $q->where('nome', 'like', "%{$editora}%")
-        );
+        return $query->whereHas('editora', fn ($q) => $q->where('nome', 'like', "%{$editora}%"));
     }
 
     #[\Illuminate\Database\Eloquent\Attributes\Scope]
     protected function disponivel($query)
     {
-        return $query->whereDoesntHave('requisicao', fn ($q) => $q->where('requisicao_livro.entregue', false)
-        );
+        return $query->whereDoesntHave('requisicao', fn ($q) => $q->where('requisicao_livro.entregue', false));
     }
 
     #[\Illuminate\Database\Eloquent\Attributes\Scope]
     protected function indisponivel($query)
     {
-        return $query->whereHas('requisicao', fn ($q) => $q->where('requisicao_livro.entregue', false)
-        );
+        return $query->whereHas('requisicao', fn ($q) => $q->where('requisicao_livro.entregue', false));
     }
 
     #[\Illuminate\Database\Eloquent\Attributes\Scope]
     protected function available($query)
     {
-        return $query->whereDoesntHave('requisicao', function ($q) {
-            $q->wherePivot('entregue', false);
-        });
+        return $this->disponivel($query);
     }
 }

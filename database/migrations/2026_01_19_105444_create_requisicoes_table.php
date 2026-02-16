@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('requisicoes', function (Blueprint $table) {
             $table->id();
-            $table->string('numero');
+            $table->string('numero')->unique();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->string('estado');
 

@@ -30,6 +30,8 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Livro::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Autor::class)->constrained()->cascadeOnDelete();
+
+            $table->unique(['livro_id', 'autor_id']);
         });
     }
 
