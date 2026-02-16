@@ -13,7 +13,7 @@ class UpdateLivroRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,14 @@ class UpdateLivroRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nome' => ['required', 'string', 'max:255'],
+            'autores' => ['required', 'array'],
+            'autores.*' => ['integer', 'exists:autores,id'],
+            'editora_id' => ['required', 'integer', 'exists:editoras,id'],
+            'bibliografia' => ['required', 'string'],
+            'isbn' => ['required', 'string', 'max:20'],
+            'preco' => ['required', 'numeric', 'min:0'],
+            'imagem' => ['nullable', 'image', 'max:2048'],
         ];
     }
 }

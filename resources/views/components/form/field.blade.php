@@ -15,7 +15,6 @@
             {{$attributes}}
         >{{old($name)}}</textarea>
     @else
-
         <input
             type="{{$type}}"
             id="{{$name}}"

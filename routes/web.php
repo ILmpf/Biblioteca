@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
             'index' => 'livro.index',
             'show' => 'livro.show',
             'store' => 'livro.store',
+            'update' => 'livro.update',
             'destroy' => 'livro.destroy',
         ]);
     // EDITORAS

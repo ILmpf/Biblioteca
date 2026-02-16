@@ -42,6 +42,7 @@ class Livro extends Model
     protected function casts(): array
     {
         return [
+            'preco' => 'decimal:2',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];

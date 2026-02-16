@@ -24,10 +24,14 @@ class StoreLivroRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => ['required', 'string'],
-            'autor' => ['required', 'string'],
-            'editora' => ['required', 'string'],
+            'nome' => ['required', 'string', 'max:255'],
+            'autores' => ['required', 'array'],
+            'autores.*' => ['integer', 'exists:autores,id'],
+            'editora_id' => ['required', 'integer', 'exists:editoras,id'],
             'bibliografia' => ['required', 'string'],
+            'isbn' => ['required', 'string', 'max:20'],
+            'preco' => ['required', 'numeric', 'min:0'],
+            'imagem' => ['nullable', 'image', 'max:2048'],
         ];
     }
 }

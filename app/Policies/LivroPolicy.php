@@ -46,7 +46,14 @@ class LivroPolicy
      */
     public function delete(User $user, Livro $livro): bool
     {
-        return $user->role === 'admin';
+        if ($user->role !== 'admin') {
+            return false;
+        }
+
+        // Prevent deletion if book is on any active requisitions
+        return ! $livro->requisicao()
+            ->where('estado', \App\RequisicaoEstado::ACTIVE)
+            ->exists();
     }
 
     /**
