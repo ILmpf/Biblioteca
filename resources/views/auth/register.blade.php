@@ -1,7 +1,7 @@
 <x-layout>
     <!-- Página de Registo -->
     <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="w-full {{ isset($role) && $role === 'admin' ? 'max-w-md' : 'max-w-6xl' }}">
+        <div class="w-auto {{ isset($role) && $role === 'admin' ? 'max-w-md' : 'max-w-6xl' }}">
             <div class="grid {{ isset($role) && $role === 'admin' ? 'grid-cols-1' : 'lg:grid-cols-2' }} gap-8 items-center">
                 
                 <div class="w-full max-w-md mx-auto {{ isset($role) && $role === 'admin' ? '' : 'lg:order-1' }}">

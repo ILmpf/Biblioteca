@@ -28,20 +28,16 @@ class UpdateRequisicaoAction
 
             if ($newState === RequisicaoEstado::COMPLETED) {
                 $updateData['data_entrega'] = $data['data_entrega'] ?? now();
-            } 
-            elseif ($newState === RequisicaoEstado::CANCELLED) {
+            } elseif ($newState === RequisicaoEstado::CANCELLED) {
                 $updateData['data_entrega'] = null;
 
                 $data['livros_entregue'] = $requisicao->livros->pluck('id')->toArray();
-            } 
-            elseif ($newState === RequisicaoEstado::ACTIVE) {
+            } elseif ($newState === RequisicaoEstado::ACTIVE) {
                 if (isset($data['data_entrega']) && ! empty($data['data_entrega'])) {
                     $updateData['data_entrega'] = $data['data_entrega'];
-                } 
-                elseif ($previousState !== RequisicaoEstado::ACTIVE) {
+                } elseif ($previousState !== RequisicaoEstado::ACTIVE) {
                     $updateData['data_entrega'] = null;
-                } 
-                else {
+                } else {
                     $updateData['data_entrega'] = $requisicao->data_entrega;
                 }
             }

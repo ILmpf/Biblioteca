@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Autor;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Http;
 class Google
 {
     protected string $baseUrl;
+
     protected string $apiKey;
 
     public function __construct()
@@ -20,7 +23,7 @@ class Google
 
     public function search(string $query, int $maxResults = 10): array
     {
-        $response = Http::get($this->baseUrl . '/volumes', [
+        $response = Http::get($this->baseUrl.'/volumes', [
             'q' => $query,
             'maxResults' => $maxResults,
             'key' => $this->apiKey,
@@ -41,7 +44,7 @@ class Google
                     break;
                 }
             }
-            if (!$isbn) {
+            if (! $isbn) {
                 foreach ($info['industryIdentifiers'] ?? [] as $identifier) {
                     if ($identifier['type'] === 'ISBN_10') {
                         $isbn = $identifier['identifier'];
@@ -49,7 +52,9 @@ class Google
                     }
                 }
             }
-            if (!$isbn) continue;
+            if (! $isbn) {
+                continue;
+            }
 
             $editora = Editora::firstOrCreate(['nome' => $info['publisher'] ?? 'Desconhecida']);
 
@@ -71,7 +76,7 @@ class Google
         }
     }
 
-    public function searcAndSave(string $query, int $maxResults = 10): void
+    public function searchAndSave(string $query, int $maxResults = 10): void
     {
         $results = $this->search($query, $maxResults);
         $this->saveBooks($results);

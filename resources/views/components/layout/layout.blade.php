@@ -9,12 +9,12 @@
 <body>
     <x-layout.nav />
 
+    <x-layout.notifications />
+
     <main class="max-w-7xl mx-auto px-6 min-h-[calc(100vh-4rem-20rem)]">
         {{ $slot }}
     </main>
 
     <x-layout.footer />
-
-    <x-layout.notifications />
 </body>
 </html>

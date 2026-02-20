@@ -152,11 +152,3 @@
         </form>
     </div>
 @endcan
-
-<!-- Notificação -->
-@if(session('success'))
-    <div class="alert alert-success shadow-lg mt-6" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
-        <x-fas-check-circle class="h-6 w-6" />
-        <span>{{ session('success') }}</span>
-    </div>
-@endif

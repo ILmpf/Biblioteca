@@ -11,30 +11,6 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Mensagens de Validação -->
-                @if(session('success'))
-                    <div class="alert alert-success shadow-lg" x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)">
-                        <x-fas-check-circle class="h-6 w-6" />
-                        <span>{{ session('success') }}</span>
-                    </div>
-                @endif
-
-                @if($errors->any())
-                    <div class="alert alert-error shadow-lg">
-                        <div>
-                            <x-fas-exclamation-circle class="h-6 w-6" />
-                            <div>
-                                <h3 class="font-bold">Erros de Validação</h3>
-                                <ul class="list-disc list-inside mt-2">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
                 <!-- Perfil -->
                 <div class="card bg-base-100 shadow-2xl hover:shadow-3xl transition-all duration-300">
                     <div class="card-body p-8">

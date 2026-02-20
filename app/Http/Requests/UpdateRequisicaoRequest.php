@@ -32,8 +32,8 @@ class UpdateRequisicaoRequest extends FormRequest
             ],
             'data_entrega' => ['nullable', 'date', 'after_or_equal:data_requisicao'],
             'data_entrega_prevista' => ['nullable', 'date', 'after_or_equal:data_requisicao'],
-            'livros_entregues' => ['nullable', 'array'],
-            'livros_entregues.*' => ['exists:livros,id'],
+            'livros_entregue' => ['nullable', 'array'],
+            'livros_entregue.*' => ['exists:livros,id'],
         ];
     }
 
