@@ -67,6 +67,16 @@
                             <span>Admin</span>
                         </x-slot:trigger>
 
+                        <x-navbar.dropdown-item 
+                            href="{{ route('review.index') }}"
+                            :active="request()->routeIs('review.*')"
+                        >
+                            <x-slot:icon>
+                                <x-fas-star class="w-5 h-5" />
+                            </x-slot:icon>
+                            Gerir Reviews
+                        </x-navbar.dropdown-item>
+
                         <li>
                             <details>
                                 <summary class="flex items-center gap-2">

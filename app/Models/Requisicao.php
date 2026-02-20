@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property \Illuminate\Support\Carbon $data_entrega_prevista
  * @property-read User $user
  * @property-read \Illuminate\Database\Eloquent\Collection|Livro[] $livros
+ * @property-read \Illuminate\Database\Eloquent\Collection|Review[] $reviews
  */
 class Requisicao extends Model
 {
@@ -69,5 +71,25 @@ class Requisicao extends Model
     {
         return $this->belongsToMany(Livro::class, 'requisicao_livro')
             ->withPivot('entregue');
+    }
+
+    /**
+     * Reviews relationship.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Requisicao $requisicao) {
+            $requisicao->numero = 'REQ-TMP-'.uniqid();
+        });
+
+        static::created(function (Requisicao $requisicao) {
+            $requisicao->numero = 'REQ-'.$requisicao->id;
+            $requisicao->saveQuietly();
+        });
     }
 }

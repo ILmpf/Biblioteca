@@ -7,25 +7,24 @@ use App\Http\Controllers\RequisicaoController;
 use App\Http\Controllers\SessionsController;
 use App\Models\Livro;
 use App\Models\User;
-
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // PUBLICO
-Route::get('/', function () {
+Route::get('/', function (): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View {
     $featuredBooks = Livro::with(['autor', 'editora'])
         ->disponivel()
         ->latest()
         ->take(6)
         ->get();
-    
+
     $stats = [
         'total_books' => Livro::count(),
         'available_books' => Livro::disponivel()->count(),
         'total_authors' => \App\Models\Autor::count(),
     ];
-    
+
     return view('welcome', [
         'featuredBooks' => $featuredBooks,
         'stats' => $stats,
@@ -47,14 +46,14 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     if (! $user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
         event(new Verified($user));
-        
-        $user->notify(new \App\Notifications\EmailVerified());
+
+        $user->notify(new \App\Notifications\EmailVerified);
     }
 
     return redirect('/login')->with('success', 'Conta confirmada com sucesso! Já podes iniciar sessão.');
 })->middleware(['signed'])->name('verification.verify');
 
-//CONFIRMAR CONTA
+// CONFIRMAR CONTA
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
 
@@ -76,6 +75,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [SessionsController::class, 'destroy']);
     // LIVROS
     Route::post('/livros/import-google', [LivroController::class, 'importGoogle'])->name('livro.import-google');
+    Route::post('/livros/{livro}/alert/subscribe', [LivroController::class, 'subscribeAlert'])->name('livro.alert.subscribe');
+    Route::delete('/livros/{livro}/alert/unsubscribe', [LivroController::class, 'unsubscribeAlert'])->name('livro.alert.unsubscribe');
     Route::resource('livros', LivroController::class)
         ->except(['create', 'edit'])
         ->names([
@@ -98,14 +99,30 @@ Route::middleware('auth')->group(function () {
 Route::resource('requisicoes', RequisicaoController::class)
     ->middleware(['auth', 'verified'])
     ->parameters([
-        'requisicoes' => 'requisicao'
+        'requisicoes' => 'requisicao',
     ])
-    ->only(['index', 'create', 'store', 'show'])
+    ->only(['index', 'create', 'store', 'show', 'update'])
     ->names([
         'index' => 'requisicao.index',
         'create' => 'requisicao.create',
         'store' => 'requisicao.store',
         'show' => 'requisicao.show',
+        'update' => 'requisicao.update',
     ]);
 Route::patch('/requisicoes/{requisicao}/cancel', [RequisicaoController::class, 'cancel'])
     ->name('requisicao.cancel');
+
+// REVIEWS
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/requisicoes/{requisicao}/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])
+        ->name('review.store');
+});
+
+Route::middleware(['auth', 'can:isAdmin'])->group(function () {
+    Route::get('/reviews', [\App\Http\Controllers\ReviewController::class, 'index'])
+        ->name('review.index');
+    Route::get('/reviews/{review}', [\App\Http\Controllers\ReviewController::class, 'show'])
+        ->name('review.show');
+    Route::patch('/reviews/{review}', [\App\Http\Controllers\ReviewController::class, 'update'])
+        ->name('review.update');
+});

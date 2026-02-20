@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\Autor;
 use App\Models\Livro;
 use App\Models\Requisicao;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -40,5 +41,6 @@ class DatabaseSeeder extends Seeder
         Livro::factory(30)->create();
         Requisicao::factory(10)->create();
         Requisicao::factory(5)->for($cidadao, 'user')->create();
+        Review::factory(20)->create();
     }
 }

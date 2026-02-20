@@ -4,24 +4,28 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Requisicao\CreateRequisicaoAction;
+use App\Actions\Requisicao\UpdateRequisicaoAction;
+use App\Http\Requests\StoreRequisicaoRequest;
+use App\Http\Requests\UpdateRequisicaoRequest;
 use App\Models\Livro;
 use App\Models\Requisicao;
-use App\Notifications\RequisicaoCreated;
 use App\RequisicaoEstado;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class RequisicaoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $user = auth()->user();
-
+        $user = $request->user();
         $baseQuery = Requisicao::query()
             ->when($user->role !== 'admin', fn ($q) => $q->where('user_id', $user->id));
 
@@ -30,7 +34,6 @@ class RequisicaoController extends Controller
         $entreguesHoje = (clone $baseQuery)->whereDate('data_entrega', today())->count();
 
         $filteredQuery = (clone $baseQuery);
-
         if ($request->filtro) {
             match ($request->filtro) {
                 'ativas' => $filteredQuery->where('estado', RequisicaoEstado::ACTIVE),
@@ -45,19 +48,22 @@ class RequisicaoController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('requisicao.index', ['requisicoes' => $requisicoes, 'ativas' => $ativas, 'ultimos30Dias' => $ultimos30Dias, 'entreguesHoje' => $entreguesHoje]);
+        return view('requisicao.index', [
+            'requisicoes' => $requisicoes,
+            'ativas' => $ativas,
+            'ultimos30Dias' => $ultimos30Dias,
+            'entreguesHoje' => $entreguesHoje,
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(Request $request): View
     {
-        $livroSelecionado = null;
-
-        if ($request->filled('livro_id')) {
-            $livroSelecionado = Livro::available()->findOrFail($request->livro_id);
-        }
+        $livroSelecionado = $request->filled('livro_id')
+            ? Livro::available()->findOrFail($request->livro_id)
+            : null;
 
         $livrosDisponiveis = Livro::available()->get();
 
@@ -70,75 +76,34 @@ class RequisicaoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequisicaoRequest $request, CreateRequisicaoAction $action): RedirectResponse
     {
-        $request->validate([
-            'livros' => ['required', 'array', 'min:1', 'max:3'],
-            'livros.*' => ['required', 'exists:livros,id'],
-        ]);
-
-        $livrosId = collect($request->livros)
-            ->filter()
-            ->unique();
-
-        if (! Gate::allows('create', [Requisicao::class, $livrosId->count()])) {
-            return back()
-                ->withErrors([
-                    'livros' => 'Não pode requisitar mais de 3 livros em simultâneo.',
-                ])
-                ->withInput();
+        try {
+            $action->handle($request->validated(), $request->user());
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
         }
-
-        $livros = Livro::whereIn('id', $livrosId)->get();
-
-        foreach ($livros as $livro) {
-            if (! $livro->isAvailable()) {
-                return back()
-                    ->withErrors([
-                        'livros' => "O livro \"{$livro->nome}\" não está disponível.",
-                    ])
-                    ->withInput();
-            }
-        }
-
-        DB::transaction(function () use ($livrosId) {
-            $requisicao = Requisicao::create([
-                'numero' => 'TEMP',
-                'user_id' => auth()->id(),
-                'estado' => RequisicaoEstado::ACTIVE,
-                'data_requisicao' => now(),
-                'data_entrega_prevista' => now()->addDays(5),
-            ]);
-
-            $requisicao->update([
-                'numero' => 'REQ-'.$requisicao->id,
-            ]);
-
-            $requisicao->livros()->attach(
-                $livrosId->mapWithKeys(fn ($id) => [
-                    $id => ['entregue' => false],
-                ])
-            );
-
-            Auth::user()->notify((new RequisicaoCreated($requisicao))->afterCommit());
-        });
 
         return redirect()
             ->route('requisicao.index')
-            ->with('success', 'Requisicao criada com sucesso! Reberás um mail com os detalhes.');
+            ->with('success', 'Requisição criada com sucesso! Receberás um mail com os detalhes.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Requisicao $requisicao)
+    public function show(Requisicao $requisicao): View
     {
+        Gate::authorize('view', $requisicao);
+
+        $requisicao->load(['livros', 'user', 'reviews.livro']);
+
         return view('requisicao.show', [
             'requisicao' => $requisicao,
         ]);
     }
 
-    public function cancel(Requisicao $requisicao)
+    public function cancel(Requisicao $requisicao): RedirectResponse
     {
         Gate::authorize('cancel', $requisicao);
 
@@ -163,19 +128,18 @@ class RequisicaoController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Requisicao $requisicao): void
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Requisicao $requisicao): void
-    {
-        //
+    public function update(
+        UpdateRequisicaoRequest $request,
+        Requisicao $requisicao,
+        UpdateRequisicaoAction $action
+    ): RedirectResponse {
+        $action->handle($requisicao, $request->validated());
+
+        return redirect()
+            ->route('requisicao.show', $requisicao)
+            ->with('success', 'Requisição atualizada com sucesso.');
     }
 
     /**
