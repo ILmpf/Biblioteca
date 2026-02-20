@@ -14,12 +14,8 @@ class RegisterUserAction
     public function handle(array $data): array
     {
         $role = $data['role'] ?? 'cidadão';
-        
-        if ($role === 'admin') {
-            $password = Str::password(8);
-        } else {
-            $password = $data['password'];
-        }
+
+        $password = $role === 'admin' ? Str::password(8) : $data['password'];
 
         $user = User::create([
             'name' => $data['name'],

@@ -33,7 +33,7 @@ class SessionsController extends Controller
 
         if (! $user->hasVerifiedEmail()) {
             Auth::logout();
-            
+
             return back()
                 ->withErrors(['email' => 'Precisas de confirmar a tua conta antes de iniciar sessão.'])
                 ->withInput($request->only('email'));

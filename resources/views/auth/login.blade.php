@@ -1,4 +1,5 @@
 <x-layout>
+    <!-- Página de Login -->
     <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="w-full max-w-6xl">
             <div class="grid lg:grid-cols-2 gap-8 items-center">

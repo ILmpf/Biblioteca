@@ -19,6 +19,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $password
  * @property \Illuminate\Support\Carbon $email_verified_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Requisicao[] $requisicoes
+ * @property-read \Illuminate\Database\Eloquent\Collection|Review[] $reviews
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -68,6 +69,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Requisicao::class);
     }
 
+    /**
+     * Reviews relationship.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Availability alerts relationship.
+     */
+    public function availabilityAlerts(): HasMany
+    {
+        return $this->hasMany(AlertaDisponibilidadeLivro::class);
+    }
+
     // HELPERS
     public function activeRentedBooksCount(): int
     {
@@ -82,6 +99,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new CustomVerifyEmail());
+        $this->notify(new CustomVerifyEmail);
     }
 }

@@ -1,4 +1,5 @@
 <x-layout>
+    <!-- Página de Registo -->
     <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="w-full {{ isset($role) && $role === 'admin' ? 'max-w-md' : 'max-w-6xl' }}">
             <div class="grid {{ isset($role) && $role === 'admin' ? 'grid-cols-1' : 'lg:grid-cols-2' }} gap-8 items-center">
@@ -295,7 +296,7 @@
                     </div>
 
                     <!-- Indicadores de Confiança -->
-                    <div class="bg-base-100/50 rounded-2xl p-6 border border-base-300">
+                    {{-- <div class="bg-base-100/50 rounded-2xl p-6 border border-base-300">
                         <div class="flex items-center justify-around text-center">
                             <div>
                                 <div class="text-3xl font-bold text-primary">10k+</div>
@@ -312,7 +313,7 @@
                                 <div class="text-xs text-base-content/60 mt-1">Avaliação</div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 @endif
             </div>

@@ -7,9 +7,9 @@ namespace App\Http\Controllers;
 use App\Actions\RegisterUserAction;
 use App\Http\Requests\StoreUserRequest;
 use App\Notifications\AdminAccountCreated;
-use Illuminate\Support\Facades\Gate;
-use \Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
