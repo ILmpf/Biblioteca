@@ -1,12 +1,14 @@
 <x-layout>
+    <!-- Página de Detalhes do Livro -->
     <div class="py-8 max-w-7xl mx-auto">
-        <!-- Breadcrumb & Ações -->
+        <!-- Navegação e Ações -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-            <a href="{{ route('livro.index') }}" class="flex items-center gap-2 text-sm hover:text-primary transition-colors group">
-                <x-fas-arrow-left class="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                <span class="font-medium">Voltar ao Catálogo</span>
-            </a>
+            <x-layout.breadcrumb 
+                url="{{ route('livro.index') }}" 
+                text="Voltar ao Catálogo" 
+            />
 
+            <!-- Botões de Administração -->
             @can('isAdmin')
                 <div class="flex gap-3">
                     <button 
@@ -47,6 +49,7 @@
 
         <!-- Conteúdo Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Barra Lateral -->
             <div class="lg:col-span-1">
                 <div class="sticky top-8 space-y-6">
                     <!-- Capa do Livro -->
@@ -59,14 +62,14 @@
                                 class="object-cover w-full h-full transition-transform group-hover:scale-105"
                             />
                             
-                            <!-- Ampliar -->
+                            <!-- Abrir imagem -->
                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                 <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-3">
                                     <x-fas-search-plus class="h-6 w-6 text-gray-800" />
                                 </div>
                             </div>
                             
-                            <!-- Estado -->
+                            <!-- Estado de Disponibilidade -->
                             <div class="absolute top-4 right-4">
                                 @if($livro->isAvailable())
                                     <div class="badge badge-success badge-lg gap-2 shadow-lg">
@@ -83,7 +86,7 @@
                         </figure>
                     </div>
 
-                    <!-- Botão de Ação -->
+                    <!-- Botão de Ação Principal -->
                     @if($livro->isAvailable())
                         <a 
                             href="{{ route('requisicao.create', ['livro_id' => $livro->id]) }}"
@@ -100,6 +103,38 @@
                             <x-fas-times class="h-5 w-5" />
                             Indisponível de momento
                         </button>
+
+                        @auth
+                            <!-- Alerta de Disponibilidade -->
+                            @if($livro->hasAlert(auth()->user()))
+                                <form method="POST" action="{{ route('livro.alert.unsubscribe', $livro) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button 
+                                        type="submit"
+                                        class="btn btn-outline btn-warning btn-lg w-full gap-2"
+                                    >
+                                        <x-fas-bell-slash class="h-5 w-5" />
+                                        Cancelar Alerta
+                                    </button>
+                                </form>
+                                <div class="alert alert-info text-sm">
+                                    <x-fas-info-circle class="h-4 w-4" />
+                                    <span>Receberás um email quando este livro estiver disponível.</span>
+                                </div>
+                            @else
+                                <form method="POST" action="{{ route('livro.alert.subscribe', $livro) }}">
+                                    @csrf
+                                    <button 
+                                        type="submit"
+                                        class="btn btn-outline btn-info btn-lg w-full gap-2"
+                                    >
+                                        <x-fas-bell class="h-5 w-5" />
+                                        Notificar-me quando disponível
+                                    </button>
+                                </form>
+                            @endif
+                        @endauth
                     @endif
 
                     <!-- Informações -->
@@ -148,6 +183,7 @@
                 </div>
             </div>
 
+            <!-- Conteúdo Principal -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Título e Descrição -->
                 <div>
@@ -161,7 +197,7 @@
                     </div>
                 </div>
 
-                <!-- Bibliografia -->
+                <!-- Secção de Sinopse -->
                 <div class="card bg-base-100 shadow-lg">
                     <div class="card-body">
                         <h2 class="card-title text-2xl mb-4 flex items-center gap-2">
@@ -174,7 +210,74 @@
                     </div>
                 </div>
 
-                <!-- Histórico de Requisições -->
+                <!-- Secção de Reviews -->
+                @php
+                    $activeReviews = $livro->reviews()->aprovada()->with('user')->latest()->get();
+                    $averageRating = $activeReviews->avg('rating');
+                    $totalReviews = $activeReviews->count();
+                @endphp
+
+                @if($totalReviews > 0)
+                    <div class="card bg-base-100 shadow-lg">
+                        <div class="card-body">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="card-title text-2xl flex items-center gap-2">
+                                    <x-fas-star class="h-6 w-6 text-yellow-500" />
+                                    Reviews dos Leitores
+                                </h2>
+                                <div class="text-right">
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-yellow-500 text-2xl">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                @if($i <= round($averageRating))
+                                                    ★
+                                                @else
+                                                    ☆
+                                                @endif
+                                            @endfor
+                                        </div>
+                                        <span class="text-2xl font-bold">{{ number_format($averageRating, 1) }}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500">{{ $totalReviews }} {{ $totalReviews === 1 ? 'review' : 'reviews' }}</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                @foreach($activeReviews as $review)
+                                    <div class="border-b border-base-300 last:border-b-0 pb-4 last:pb-0">
+                                        <div class="flex items-start gap-4">
+                                            <div class="avatar">
+                                                <div class="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                                                    <img src="{{ asset($review->user->image_path) }}" alt="{{ $review->user->name }}" />
+                                                </div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <div>
+                                                        <p class="font-bold">{{ $review->user->name }}</p>
+                                                        <p class="text-xs text-gray-500">{{ $review->created_at->format('d/m/Y') }}</p>
+                                                    </div>
+                                                    <div class="text-yellow-500">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            @if($i <= $review->rating)
+                                                                ★
+                                                            @else
+                                                                ☆
+                                                            @endif
+                                                        @endfor
+                                                    </div>
+                                                </div>
+                                                <p class="text-base-content/80 leading-relaxed">{{ $review->comentario }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Secção de Histórico de Requisições -->
                 <div class="card bg-base-100 shadow-lg">
                     <div class="card-body">
                         <h2 class="card-title text-2xl mb-4 flex items-center gap-2">
@@ -267,7 +370,7 @@
         </form>
     </dialog>
 
-    <!-- Modal de Edição -->
+    <!-- Modal de Edição do Livro -->
     <x-modal name="edit-livro" title="Editar Livro">
         <form method="POST" action="{{ route('livro.update', $livro) }}" class="w-full" enctype="multipart/form-data"
             x-data="{

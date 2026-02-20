@@ -3,6 +3,7 @@
 use App\Models\Autor;
 use App\Models\Editora;
 use App\Models\Livro;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -33,6 +34,17 @@ return new class extends Migration
 
             $table->unique(['livro_id', 'autor_id']);
         });
+
+        Schema::create('alertas_disponibilidade_livros', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Livro::class)->constrained()->cascadeOnDelete();
+            $table->boolean('notificado')->default(false);
+            $table->timestamps();
+
+            $table->unique(['user_id', 'livro_id']);
+            $table->index(['livro_id', 'notificado']);
+        });
     }
 
     /**
@@ -42,5 +54,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('livros');
         Schema::dropIfExists('autor_livro');
+        Schema::dropIfExists('alertas_disponibilidade_livros');
     }
 };

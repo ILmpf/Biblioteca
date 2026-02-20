@@ -8,6 +8,7 @@ use App\Actions\Livro\CreateLivroAction;
 use App\Actions\Livro\UpdateLivroAction;
 use App\Http\Requests\StoreLivroRequest;
 use App\Http\Requests\UpdateLivroRequest;
+use App\Models\AlertaDisponibilidadeLivro;
 use App\Models\Autor;
 use App\Models\Editora;
 use App\Models\Livro;
@@ -144,5 +145,43 @@ class LivroController extends Controller
         $livro->delete();
 
         return to_route('livro.index')->with('success', 'Livro eliminado com sucesso!');
+    }
+
+    /**
+     * Subscribe user to availability alert for this book.
+     */
+    public function subscribeAlert(Livro $livro, Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($livro->isAvailable()) {
+            return back()->with('info', 'Este livro já está disponível para requisição!');
+        }
+
+        if ($livro->hasAlert($user)) {
+            return back()->with('info', 'Já estás inscrito para receber alertas sobre este livro.');
+        }
+
+        AlertaDisponibilidadeLivro::create([
+            'user_id' => $user->id,
+            'livro_id' => $livro->id,
+        ]);
+
+        return back()->with('success', 'Receberás um email assim que o livro estiver disponível!');
+    }
+
+    /**
+     * Unsubscribe user from availability alert.
+     */
+    public function unsubscribeAlert(Livro $livro, Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        AlertaDisponibilidadeLivro::where('user_id', $user->id)
+            ->where('livro_id', $livro->id)
+            ->where('notificado', false)
+            ->delete();
+
+        return back()->with('success', 'Alerta removido com sucesso.');
     }
 }

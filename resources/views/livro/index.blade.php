@@ -1,49 +1,44 @@
 <x-layout>
-    <div>
-        <!-- Header -->
-        <header class="py-12 md:py-16 relative overflow-hidden">
-            <div class="absolute inset-0 bg-linear-to-r from-primary/5 via-secondary/5 to-accent/5 -z-10"></div>
-            <div class="flex flex-col items-center text-center gap-6">
-                <div>
-                    <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-primary">
-                        Catálogo de Livros
-                    </h1>
-                    <p class="text-base-content/70 mt-3 text-lg">
-                        Explora a nossa coleção e encontra o teu próximo livro favorito!
-                    </p>
-                </div>
+    <!-- Página de Catálogo de Livros -->
+    <!-- Header -->
+    <x-layout.header
+        title="Catálogo de Livros" 
+        description="Explora a nossa coleção e encontra o teu próximo livro favorito!"
+        :centered="true"
+    >
+        <x-slot:actions>
+            @can('isAdmin')
+                <button
+                    class="btn btn-primary gap-2 shadow-lg hover:shadow-xl transition-all"
+                    x-data
+                    @click="$dispatch('open-modal', 'create-livro')"
+                    type="button"
+                >
+                    <x-fas-plus class="h-5 w-5" />
+                    Criar Novo Livro
+                </button>
+            @endcan
+        </x-slot:actions>
+    </x-layout.header>
 
-                @can('isAdmin')
-                    <button
-                        class="btn btn-primary gap-2 shadow-lg hover:shadow-xl transition-all"
-                        x-data
-                        @click="$dispatch('open-modal', 'create-livro')"
-                        type="button"
-                    >
-                        <x-fas-plus class="h-5 w-5" />
-                        Criar Novo Livro
-                    </button>
-                @endcan
-            </div>
-        </header>
+    <!-- Secção de Filtros -->
+    @include('livro.partials.filters')
 
-        @include('livro.partials.filters')
-
-        <!-- Informações de Resultados & Paginação -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-8">
-            <div class="text-sm">
-                <span class="text-base-content/70">A mostrar</span>
-                <span class="font-bold text-primary">{{ $livros->firstItem() ?? 0 }}</span>
-                <span class="text-base-content/70">–</span>
-                <span class="font-bold text-primary">{{ $livros->lastItem() ?? 0 }}</span>
-                <span class="text-base-content/70">de</span>
-                <span class="font-bold text-secondary">{{ $livros->total() }}</span>
-                <span class="text-base-content/70">livros</span>
-            </div>
-            {{ $livros->links('components.form.pagination') }}
+    <!-- Informações de Paginação -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-8">
+        <div class="text-sm">
+            <span class="text-base-content/70">A mostrar</span>
+            <span class="font-bold text-primary">{{ $livros->firstItem() ?? 0 }}</span>
+            <span class="text-base-content/70">–</span>
+            <span class="font-bold text-primary">{{ $livros->lastItem() ?? 0 }}</span>
+            <span class="text-base-content/70">de</span>
+            <span class="font-bold text-secondary">{{ $livros->total() }}</span>
+            <span class="text-base-content/70">livros</span>
         </div>
+        {{ $livros->links('components.form.pagination') }}
+    </div>
 
-        <!-- Livros -->
+    <!-- Catálogo de Livros -->
         <div class="mt-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($livros as $livro)
@@ -73,7 +68,7 @@
                                 </span>
                             </div>
 
-                            <!-- Estado -->
+                            <!-- Estado de Disponibilidade -->
                             <div class="pt-2">
                                 @if($livro->isAvailable())
                                     <div class="badge badge-success gap-1">
@@ -104,22 +99,28 @@
                         </x-slot:actions>
                     </x-card>
 
-                @empty
-                    <div class="col-span-full text-center py-16">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-base-200 mb-4">
+            @empty
+                <div class="col-span-full">
+                    <x-layout.empty-state 
+                        title="Nenhum livro encontrado" 
+                        description="Tenta ajustar os teus filtros de pesquisa"
+                    >
+                        <x-slot:icon>
                             <x-fas-book class="h-10 w-10 text-base-content/30" />
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2">Nenhum livro encontrado</h3>
-                        <p class="text-base-content/70 mb-4">Tenta ajustar os teus filtros de pesquisa</p>
-                        <a href="{{ route('livro.index') }}" class="btn btn-primary gap-2">
-                            <x-fas-undo class="h-4 w-4" />
-                            Limpar Filtros
-                        </a>
-                    </div>
-                @endforelse
-            </div>
+                        </x-slot:icon>
+                        
+                        <x-slot:action>
+                            <a href="{{ route('livro.index') }}" class="btn btn-primary gap-2">
+                                <x-fas-undo class="h-4 w-4" />
+                                Limpar Filtros
+                            </a>
+                        </x-slot:action>
+                    </x-layout.empty-state>
+                </div>
+            @endforelse
         </div>
-
-        @include('livro.partials.create-modal')
     </div>
+
+    <!-- Modal de Criação -->
+    @include('livro.partials.create-modal')
 </x-layout>
